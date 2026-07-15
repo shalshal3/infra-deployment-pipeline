@@ -12,8 +12,3 @@ variable "sn_cidr" {
   type        = string
   description = "cidr value of sn"
 }
-
-variable "subnet_az" {
-  type        = string
-  description = "az value of sn"
-}
