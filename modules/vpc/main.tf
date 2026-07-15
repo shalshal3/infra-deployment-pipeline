@@ -10,7 +10,6 @@ resource "aws_vpc" "myvpc" {
 resource "aws_subnet" "myvpc" {
   vpc_id     = aws_vpc.myvpc.id
   cidr_block = var.sn_cidr
-  availability_zone = var.subnet_az
 
   tags = {
     Name = "$(var.env) -sn"
