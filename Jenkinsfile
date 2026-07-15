@@ -1,53 +1,49 @@
 pipeline {
     agent any
+
     environment {
         ENV = "${env.BRANCH_NAME}"
         TF_WORKDIR = "environments/${env.BRANCH_NAME}"
     }
-}
 
-stages {
-    stage('checkout') {
-        steps {
-            git branch: env.BRANCH_NAME, url: 'https://github.com/shalshal3/infra-deployment-pipeline.git'
-        }
-    }
+    stages {
 
-    stage('Terraform Init') {
-        steps {
-            dir("${TF_WORKDIR}") {
-                sh 'terraform init'
-
+        stage('Checkout') {
+            steps {
+                git branch: env.BRANCH_NAME,
+                    url: 'https://github.com/shalshal3/infra-deployment-pipeline.git'
             }
         }
-    }
 
-    stage('Terraform plan') {
-        steps {
-            dir("${TF_WORKDIR}" {
-                sh 'terraform plan -out=tfplan'
-                sh 'terraform show -no-color tfplan > tfplan.txt'
-                sh 'cat tfplan.txt'
-
+        stage('Terraform Init') {
+            steps {
+                dir("${TF_WORKDIR}") {
+                    sh 'terraform init'
+                }
             }
         }
-    }
 
-    stage('Approval') {
-        /*
-        when {
-            expression { env.BRANCH_NAME == 'production'}
+        stage('Terraform Plan') {
+            steps {
+                dir("${TF_WORKDIR}") {
+                    sh 'terraform plan -out=tfplan'
+                    sh 'terraform show -no-color tfplan > tfplan.txt'
+                    sh 'cat tfplan.txt'
+                }
+            }
         }
-        */
-        steps {
-            input message: "Approve the deployment to production" , ok: 'Deploy'
+
+        stage('Approval') {
+            steps {
+                input message: 'Approve the deployment?', ok: 'Deploy'
+            }
         }
-    }
-    
-    stage('Terraform Apply') {
-        steps {
-            dir("${TF_WORKDIR}") {
-                sh 'terraform Apply tfplan'
+
+        stage('Terraform Apply') {
+            steps {
+                dir("${TF_WORKDIR}") {
+                    sh 'terraform apply tfplan'
+                }
             }
         }
     }
