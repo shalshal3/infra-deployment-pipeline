@@ -1,21 +1,21 @@
 pipeline {
     agent any
     environment {
-        ENV = "$(env.BRANCH_NAME)"
-        TF_WORKDIR = "environments/$(env.BRANCH_NAME)"
+        ENV = "${env.BRANCH_NAME}"
+        TF_WORKDIR = "environments/${env.BRANCH_NAME}"
     }
 }
 
 stages {
     stage('checkout') {
         steps {
-            git branch:"$(env.BRANCH_NAME)", url:https://github.com/Iam-mithran/LWM-Infra-Pipeline.git
+            git branch: env.BRANCH_NAME, url:https://github.com/Iam-mithran/LWM-Infra-Pipeline.git
         }
     }
 
     stage('Terraform Init') {
         steps {
-            dir("${TF_WORKDIR}" {
+            dir("${TF_WORKDIR}") {
                 sh 'terraform init'
 
             }
@@ -47,7 +47,7 @@ stages {
     stage('Terraform Apply') {
         steps {
             dir("${TF_WORKDIR}") {
-                sh 'Terraform Apply tfplan'
+                sh 'terraform Apply tfplan'
             }
         }
     }
